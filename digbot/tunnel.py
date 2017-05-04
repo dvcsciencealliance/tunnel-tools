@@ -71,6 +71,7 @@ class Tunnel(bot_handler.TelegramHandler):
                     logger.debug(" ".join(args))
                     
                     self.process = Popen(args)
+                    self.bot.sendMessage(chat_id, "Tunnel started.")
                 elif cmd[0] == "start":
                     self.bot.sendMessage(chat_id, "Process already running.")
                 elif cmd[0] == "stop" and self.process == None:
@@ -81,6 +82,7 @@ class Tunnel(bot_handler.TelegramHandler):
                     except ProcessLookupError:
                         self.bot.sendMessage(chat_id, "Process not running.")
                     self.process = None
+                    self.bot.sendMessage(chat_id, "Tunnel stopped.")
                 elif cmd[0] == "ssh" and self.process == None:
                     cmd.append("-NT")
                     cmd.append(self._cfg['user'])
@@ -89,3 +91,10 @@ class Tunnel(bot_handler.TelegramHandler):
                     self.process = Popen(cmd)
                 elif cmd[0] == "ssh":
                     self.bot.sendMessage(chat_id, "Process already running.")
+                elif cmd[0] == "kill":
+                    args = ["killall", "ssh"]
+                    Popen(args)
+                    self.process = None
+                elif cmd[0] == "status":
+                    reply = "Stopped" if self.process is None else "Running"
+                    self.bot.sendMessage(chat_id, "{}".format(reply))

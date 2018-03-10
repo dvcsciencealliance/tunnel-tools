@@ -28,8 +28,10 @@ def internet_on(url, check_str):
     except urllib.error.URLError as err:
         return False
 
-def get_wpa_status():
-    output = subprocess.check_output(["/sbin/wpa_cli", "status"])
+def get_wpa_status(*, interface=None):
+    interface_select = ["-i", interface] if interface else []
+    cmd = ["/sbin/wpa_cli"] + interface_select + ["status"]
+    output = subprocess.check_output(cmd)
     output = output.decode('utf8')
     output = output.split("\n")
     output = [o.split("=") for o in output if o and '=' in o]
@@ -74,7 +76,8 @@ def main():
     
     iok = internet_on(config['internet']['url'], config['internet']['str'])
     print("internet", iok)
-    wpa_status = get_wpa_status()
+    interface = config.get('interface', "wlan0")
+    wpa_status = get_wpa_status(interface=interface)
     ssid = wpa_status.get('ssid')
     print("ssid", ssid)
     print("ip", wpa_status.get('ip_address'))
@@ -86,7 +89,7 @@ def main():
         except requests.exceptions.ConnectionError as e:
             print("portal error:", e)
     
-    for proc_name, proc in config['ensure'].items():
+    for proc_name, proc in config.get('ensure', {}).items():
         print(proc_name)
         result = ensure(proc['ps'], proc['run'])
         for sr, status in result.items():

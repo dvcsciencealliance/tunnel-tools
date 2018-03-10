@@ -6,6 +6,7 @@ mkdir ~/logs
 virtualenv -p python3 ~/venv
 source ~/venv/bin/activate
 pip install -r ~/tunnel/requirments.txt
+sudo apt-get install autossh
 ```
 
 crontab
@@ -26,7 +27,26 @@ create config files
 * `digbot/tunnel_config.hjson`
 * `digbot/config.txt`
 
-### Example Config Files
+### Example Config Files Without SSH Tunnels
+
+`config.hjson`
+```hjson
+internet: {
+    url: http://google.com
+    str: "<title>Google</title>"
+}
+
+portal_auth: {
+    user: -
+    pass: -
+}
+
+portal_ssids: [
+    College-Students
+]
+```
+
+### Example Config Files With SSH Tunnels
 `config.hjson`
 ```hjson
 internet: {
